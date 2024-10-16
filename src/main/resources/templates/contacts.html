@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты</title>
+    <link rel="stylesheet" th:href="@{/styles/style-contacts.css}">
+</head>
+<body>
+<header>
+    <nav>
+        <button class="nav-button" onclick="window.location.href='/service/all-booked'">В использовании</button>
+        <button class="nav-button" onclick="window.location.href='/service/all-free'">Бронирование</button>
+        <button class="nav-button active" onclick="window.location.href='/service/contacts'">Контакты</button>
+        <div class="avatar-container">
+            <img th:src="@{/images/raccoon_pp.png}" alt="Аватар пользователя" class="user-avatar" onclick="window.location.href='/booking/own-reservations'">
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="container">
+        <div>
+            <form action="/user/find" method="GET" class="search-box">
+                <input type="text" name="fullName" placeholder="Введите ФИО" class="search-input">
+                <button class="search-button" type="submit">&#128269;</button>
+            </form>
+        </div>
+
+        <section class="employee-info">
+            <!-- Сообщение, если пользователей нет -->
+            <div th:if="${#lists.isEmpty(bookedServices)} and ${#lists.isEmpty(error)} and ${#lists.isEmpty(users)}" style="text-align: center; margin-top: 20px;">
+                <p>Пользователи не найдены.</p>
+                <img th:src="@{/images/catwithlaptop.png}" alt="Нет пользователей" style="max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto;">
+            </div>
+
+
+            <div th:if="${!#lists.isEmpty(users)}" >
+                <h3 style="margin-bottom: 10px">Результаты поиска:</h3>
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div th:each="user : ${users}" class="employee-card"
+                    style="display: flex; gap: 20px; background-color: #fff; padding: 20px; border-radius: 8px;
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); border: 1px solid #ddd;">
+                    <div class="employee-photo">
+                        <img th:src="@{${user.profilePicture}}" alt="Фото сотрудника"  class="employee-photo">
+                    </div>
+                    <div class="employee-details">
+                        <h2 th:text="${user.lastName} + ' ' + ${user.firstName} + ' ' + ${user.middleName}">ФИО пользователя</h2>
+                        <p th:text="'Роль: ' + ${user.role.roleName}">Role</p>
+                        <p th:text="'Команда: ' + ${user.team.teamName}">Team</p>
+                        <p th:text="'Номер телефона: ' + ${user.phoneNumber}">Phone</p>
+                        <p th:text="'Email: ' + ${user.email}">Email пользователя</p>
+                        <button class="btn-copy" th:data-email="${user.email}">Скопировать email</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Все пользователи -->
+            <div th:if="${!#lists.isEmpty(bookedServices)}">
+                <h3 style="margin-bottom: 10px">Все пользователи:</h3>
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div th:each="user : ${bookedServices}" class="employee-card"
+                         style="display: flex; gap: 20px; background-color: #fff; padding: 20px; border-radius: 8px;
+                    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); border: 1px solid #ddd;">
+                        <div class="employee-photo">
+                            <img th:src="@{${user.serviceBooking.user.profilePicture}}" alt="Фото сотрудника" class="employee-photo">
+                        </div>
+                        <div class="employee-details">
+                            <h2 th:text="${user.serviceBooking.user.lastName} + ' ' + ${user.serviceBooking.user.firstName} + ' ' + ${user.serviceBooking.user.middleName}">ФИО пользователя</h2>
+                            <p th:text="'Роль: ' + ${user.serviceBooking.user.role.roleName}">Role</p>
+                            <p th:text="'Команда: ' + ${user.serviceBooking.user.team.teamName}">Team</p>
+                            <p th:text="'Номер телефона: ' + ${user.serviceBooking.user.phoneNumber}">Phone</p>
+                            <p th:text="'Email: ' + ${user.serviceBooking.user.email}">Email пользователя</p>
+                            <button class="btn-copy" th:data-email="${user.serviceBooking.user.email}">Скопировать email</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+    </div>
+</main>
+
+<script>
+    document.querySelectorAll('.btn-copy').forEach(button => {
+        button.addEventListener('click', function() {
+            const email = this.getAttribute('data-email');
+            navigator.clipboard.writeText(email).then(() => {
+                alert('Email скопирован в буфер обмена: ' + email);
+            }).catch(err => {
+                console.error('Ошибка при копировании: ', err);
+            });
+        });
+    });
+</script>
+</body>
+</html>

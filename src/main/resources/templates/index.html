@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список сервисов на тестировании</title>
+    <link rel="stylesheet" th:href="@{/styles/style-index.css}">
+</head>
+<body>
+<header>
+    <nav>
+        <button class="nav-button active" onclick="window.location.href='/service/all-booked'">В использовании</button>
+        <button class="nav-button" onclick="window.location.href='/service/all-free'">Бронирование</button>
+        <button class="nav-button" onclick="window.location.href='/service/contacts'">Контакты</button>
+        <div class="avatar-container">
+            <img th:src="@{/images/raccoon_pp.png}" alt="Аватар пользователя" class="user-avatar" onclick="window.location.href='/booking/own-reservations'">
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="container">
+        <div>
+            <form action="/service/find-booked" method="GET" class="search-box">
+                <input type="text" name="serviceName" placeholder="Введите название сервиса" class="search-input">
+                <button class="search-button" type="submit">&#128269;</button>
+            </form>
+        </div>
+
+        <section class="service-list">
+            <div th:if="${#lists.isEmpty(bookedServices)} and ${#lists.isEmpty(searchedServices)}" style="text-align: center; margin-top: 20px;">
+                <p>Забронированные сервисы отсутствуют.</p>
+                <img th:src="@{/images/catwithlaptop.png}" alt="Нет забронированных сервисов" style="max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto;">
+            </div>
+
+            <div th:if="${!#lists.isEmpty(searchedServices)}">
+                <h3>Результаты поиска:</h3>
+                <div th:each="service : ${searchedServices}" style="margin-bottom: 10px; padding: 15px; background-color: #ffffff; border: 1px solid #1976D2; border-radius: 8px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);">
+                    <p class="service-name" th:text="${service.serviceName}">Название сервиса</p>
+                    <p class="service-env" th:text="'Тестовая среда: ' + ${service.serviceBooking.environment}">Тестовая среда</p>
+                    <p class="service-time" th:text="'Забронировано с ' + ${service.serviceBooking.startBooking} + ' до ' + ${service.serviceBooking.endBooking}">Время бронирования</p>
+                    <div class="service-user">
+                        <img th:src="@{${service.serviceBooking.user.profilePicture}}" alt="Аватар пользователя" class="user-avatar-small">
+                        <span th:text="${service.serviceBooking.user.lastName} + ' ' + ${service.serviceBooking.user.firstName}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div th:if="${!#lists.isEmpty(bookedServices)}">
+                <div th:each="service : ${bookedServices}" style="margin-bottom: 10px; padding: 15px; background-color: #ffffff; border: 1px solid #1976D2; border-radius: 8px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);">
+                    <p class="service-name" th:text="${service.serviceName}">Название сервиса</p>
+                    <p class="service-env" th:text="'Тестовая среда: ' + ${service.serviceBooking.environment}">Тестовая среда</p>
+                    <p class="service-time" th:text="'Забронировано с ' + ${service.serviceBooking.startBooking} + ' до ' + ${service.serviceBooking.endBooking}">Время бронирования</p>
+                    <div class="service-user">
+                        <img th:src="@{${service.serviceBooking.user.profilePicture}}" alt="Аватар пользователя" class="user-avatar-small">
+                        <span th:text="${service.serviceBooking.user.lastName} + ' ' + ${service.serviceBooking.user.firstName}"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+</body>
+</html>

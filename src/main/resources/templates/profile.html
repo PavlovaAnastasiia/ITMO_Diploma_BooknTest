@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <!-- Используем Thymeleaf для ссылки на файл стилей -->
+    <link rel="stylesheet" th:href="@{/styles/style-profile.css}">
+</head>
+<body>
+<header>
+    <nav>
+        <button class="nav-button" onclick="window.location.href='/service/all-booked'">В использовании</button>
+        <button class="nav-button" onclick="window.location.href='/service/all-free'">Бронирование</button>
+        <button class="nav-button" onclick="window.location.href='/service/contacts'">Контакты</button>
+        <div class="avatar-container">
+            <img th:src="@{/images/raccoon_pp.png}" alt="Аватар пользователя" class="user-avatar" onclick="window.location.href='/booking/own-reservations'">
+        </div>
+    </nav>
+</header>
+
+<main>
+    <div class="container">
+        <div class="user-info">
+            <img th:src="@{/images/raccoon_pp.png}" alt="Фото пользователя" class="user-photo">
+            <div class="user-details">
+                <h2>Павлова Анастасия Александровна</h2>
+                <p>Роль: System Analyst</p>
+                <p>Команда проекта: Kanban-Еноты</p>
+                <p>Мобильный телефон: +7 (931) 312-33-22</p>
+                <p>Рабочая почта: <a href="mailto:nastyap968@gmail.com">nastyap968@gmail.com</a></p>
+            </div>
+        </div>
+
+        <section class="reservations">
+            <!-- Если нет забронированных сервисов -->
+            <div th:if="${#lists.isEmpty(usersBooking)}" style="text-align: center; margin-top: 20px;">
+                <p>Забронированные сервисы отсутствуют.</p>
+                <img th:src="@{/images/catwithlaptop.png}" alt="Нет забронированных сервисов" style="max-width: 400px; width: 100%; height: auto; display: block; margin: 0 auto;">
+            </div>
+            <!-- Если есть забронированные сервисы -->
+            <div th:if="${!#lists.isEmpty(usersBooking)}">
+                <h3>Ваши забронированные сервисы:</h3>
+
+                <div th:each="serviceBooking : ${usersBooking}" class="reservation-item">
+                    <p class="service-name" th:text="${serviceBooking.service.serviceName}">Название сервиса</p>
+                    <p class="service-time" th:text="'Забронировано с ' + ${serviceBooking.startBooking} + ' до ' + ${serviceBooking.endBooking}">Время бронирования</p>
+
+                    <!-- Форма для отправки запроса на удаление бронирования -->
+                    <form th:action="@{/booking/delete/{bookingId}(bookingId=${serviceBooking.id})}" method="post" class="cancel-form">
+                        <input type="hidden" name="userEmail" value="nastyap968@gmail.com">
+                        <button type="submit" class="btn-cancel">Отменить бронирование</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<script>
+    document.querySelectorAll('.btn-cancel').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault(); // Отключаем стандартное поведение кнопки
+
+            const serviceName = this.closest('.reservation-item').querySelector('.service-name').innerText;
+            if (confirm(`Вы уверены, что хотите отменить бронирование сервиса ${serviceName}?`)) {
+                this.closest('form').submit(); // Отправляем форму после подтверждения
+            }
+        });
+    });
+</script>
+</body>
+</html>

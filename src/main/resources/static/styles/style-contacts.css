@@ -1,0 +1,218 @@
+/* Основные стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+header {
+    background-color: #1976D2;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    position: relative; /* Добавляем для аватарки */
+}
+
+nav {
+    display: flex;
+    justify-content: space-around;
+    width: 50%;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.nav-button:hover {
+    background-color: #1565C0; /* Подсветка при наведении */
+}
+
+.nav-button.active {
+    background-color: #0D47A1; /* Цвет для активной вкладки */
+    border-radius: 5px;        /* Слегка закругляем углы */
+    padding: 10px 20px;        /* Внутренние отступы для видимой кнопки */
+}
+
+/* Аватарка пользователя в правом углу */
+.avatar-container {
+    position: absolute;
+    right: 20px;
+}
+
+.user-avatar {
+    width: 60px; /* Увеличенный размер аватара */
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+
+    /* Сдвиг аватара вверх, чтобы не увеличивать высоту хэдера */
+    margin-top: -10px;
+}
+
+.user-avatar:hover {
+    transform: scale(1.1); /* Легкое увеличение при наведении */
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    max-width: 900px;
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.search-box {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.search-input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    width: 80%;
+}
+
+.search-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #1976D2;
+    color: white;
+    cursor: pointer;
+    margin-left: 10px;
+    border-radius: 5px;
+}
+
+.employee-info {
+    display: flex;
+    flex-direction: column; /* Расположить карточки по вертикали */
+    gap: 20px; /* Задать расстояние между карточками */
+}
+
+.employee-card {
+    display: flex;
+    gap: 20px;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd; /* Добавляем границу */
+}
+
+
+.employee-card:not(:last-child) {
+    margin-bottom: 20px; /* Отступ между карточками */
+}
+
+.employee-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.employee-details h2 {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.employee-details p {
+    font-size: 16px;
+    color: #333;
+    margin: 5px 0;
+}
+
+.btn-copy {
+    padding: 10px 20px;
+    background-color: #1976D2;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-copy:hover {
+    background-color: #1565C0;
+}
+
+.nav-button.active {
+    background-color: #1976D2; /* Синий цвет фона */
+    color: white; /* Белый цвет текста */
+    border: none; /* Убираем стандартную границу */
+    padding: 10px 20px;
+    position: relative; /* Для позиционирования нижней линии */
+}
+
+.nav-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: white; /* Белая линия */
+}
+
+footer {
+    background-color: #1976D2;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    position: static;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .nav-button {
+        font-size: 16px;
+    }
+
+    .search-input {
+        width: 75%;
+    }
+
+    .container {
+        margin-top: 10px;
+        padding: 10px;
+    }
+
+    .employee-card {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .employee-photo {
+        width: 100px;
+        height: 100px;
+    }
+}

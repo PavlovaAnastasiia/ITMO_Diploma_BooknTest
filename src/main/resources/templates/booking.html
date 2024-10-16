@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Бронирование сервисов</title>
+    <link rel="stylesheet" th:href="@{/styles/style-booking.css}">
+</head>
+<body>
+<header>
+    <nav>
+        <button class="nav-button" onclick="window.location.href='/service/all-booked'">В использовании</button>
+        <button class="nav-button active" onclick="window.location.href='/service/all-free'">Бронирование</button>
+        <!-- Эта кнопка активна -->
+        <button class="nav-button" onclick="window.location.href='/service/contacts'">Контакты</button>
+        <div class="avatar-container">
+            <img th:src="@{/images/raccoon_pp.png}" alt="Аватар пользователя" class="user-avatar"
+                 onclick="window.location.href='/booking/own-reservations'">
+        </div>
+    </nav>
+</header>
+
+
+<main>
+    <div class="container">
+        <!-- Секция для выбора сервисов -->
+        <div id="service-selection">
+            <div>
+                <form th:action="@{/service/find-free}" method="GET" class="search-box">
+                    <input type="text" name="serviceName" placeholder="Введите название сервиса" class="search-input">
+                    <button class="search-button" type="submit">&#128269;</button>
+                </form>
+            </div>
+
+            <button class="btn-confirm" onclick="bookServices()">Забронировать</button>
+
+            <!-- Проверка, был ли выполнен поиск -->
+            <div th:if="${searchedServices != null}">
+                <h3>Результаты поиска:</h3>
+                <section class="service-list">
+                    <form th:action="@{/all-free}" method="post">
+                        <div th:each="service, iterStat : ${searchedServices}"
+                             class="service-item"
+                             style="margin-bottom: 10px; padding: 15px; background-color: #ffffff; border: 1px solid #1976D2; border-radius: 8px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);">
+                            <input type="checkbox" th:id="'searchedService' + ${iterStat.index}"
+                                   th:value="${service.serviceName}" th:name="selectedServices">
+                            <label th:for="'searchedService' + ${iterStat.index}"
+                                   th:text="${service.serviceName}"></label>
+                        </div>
+                    </form>
+                </section>
+            </div>
+
+            <!-- Вывод всех свободных сервисов, если поиск не был выполнен -->
+            <section class="service-list" th:if="${searchedServices == null}">
+                <form th:action="@{/all-free}" method="post">
+                    <div th:each="service, iterStat : ${freeServices}"
+                         class="service-item"
+                         style="margin-bottom: 10px; padding: 15px; background-color: #ffffff; border: 1px solid #1976D2; border-radius: 8px; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);">
+                        <input type="checkbox" th:id="'service' + ${iterStat.index}" th:value="${service.serviceName}"
+                               th:name="selectedServices">
+                        <label th:for="'service' + ${iterStat.index}" th:text="${service.serviceName}"></label>
+                    </div>
+                </form>
+            </section>
+        </div>
+
+        <!-- Секция для формы бронирования -->
+        <div id="booking-form" style="display: none;">
+            <h2>Форма бронирования</h2>
+
+            <form id="bookingForm">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email">
+
+                <!-- Здесь будут динамически добавлены выбранные сервисы -->
+                <div id="selectedServices"></div>
+
+                <button class="btn-back" type="button" onclick="showServiceSelection()">Назад</button>
+                <button class="btn-confirm" type="button" onclick="submitBookingForm()">Подтвердить</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script th:inline="javascript">
+    function submitBookingForm() {
+        const email = document.getElementById('email').value;
+        const selectedServices = document.querySelectorAll('input[name="selectedServices"]:checked');
+        const bookingDTOs = [];
+
+        selectedServices.forEach((service, index) => {
+            const startBooking = document.getElementById(`startBooking${index}`).value;
+            const endBooking = document.getElementById(`endBooking${index}`).value;
+            const environment = document.getElementById(`environment${index}`).value;
+
+            // Преобразуем время в объекты Date для сравнения
+            const startTime = new Date(`1970-01-01T${startBooking}:00`);
+            const endTime = new Date(`1970-01-01T${endBooking}:00`);
+
+            // Проверяем, что время начала меньше времени конца
+            if (startTime >= endTime) {
+                alert(`Ошибка: время начала бронирования (${startBooking}) не может быть больше или равно времени окончания (${endBooking}) для сервиса ${service.value}.`);
+                return; // Прерываем дальнейшую обработку
+            }
+
+            const bookingDTO = {
+                email: email,
+                serviceName: service.value,
+                startBooking: startBooking,
+                endBooking: endBooking,
+                environment: environment
+            };
+            bookingDTOs.push(bookingDTO);
+        });
+
+        // Если массив bookingDTOs не пуст, отправляем данные
+        if (bookingDTOs.length > 0) {
+            fetch('/booking/book', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bookingDTOs) // Преобразование массива DTO в JSON
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = "/booking/own-reservations";
+                    } else {
+                        alert("Произошла ошибка при бронировании");
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    alert("Произошла ошибка при бронировании");
+                });
+        }
+    }
+
+    function bookServices() {
+        const selectedServices = [];
+        document.querySelectorAll('.service-item input:checked').forEach(item => {
+            selectedServices.push(item.value);
+        });
+
+        // Если нет выбранных сервисов, показываем ошибку
+        if (selectedServices.length === 0) {
+            alert('Пожалуйста, выберите хотя бы один сервис.');
+            return;
+        }
+
+        // Сохраняем выбранные сервисы в localStorage для последующего использования
+        localStorage.setItem('selectedServices', JSON.stringify(selectedServices));
+
+        // Переход к форме бронирования
+        showBookingForm();
+    }
+
+    function showBookingForm() {
+        // Скрываем секцию с выбором сервисов и показываем форму бронирования
+        document.getElementById('service-selection').style.display = 'none';
+        document.getElementById('booking-form').style.display = 'block';
+
+        // Подключаем CSS для формы бронирования
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = '/styles/style-booking-confirm.css'; // Укажите правильный путь к вашему CSS-файлу
+        link.id = 'bookingFormStyles'; // Добавляем ID, чтобы избежать повторного подключения
+        if (!document.getElementById('bookingFormStyles')) {
+            document.head.appendChild(link);
+        }
+
+        // Загружаем выбранные сервисы из localStorage
+        const selectedServices = JSON.parse(localStorage.getItem('selectedServices')) || [];
+        const selectedServicesContainer = document.getElementById('selectedServices');
+
+        if (selectedServices.length === 0) {
+            selectedServicesContainer.innerHTML = '<p>Вы не выбрали ни одного сервиса для бронирования.</p>';
+        } else {
+            selectedServicesContainer.innerHTML = ''; // Очищаем перед добавлением
+            selectedServices.forEach((service, index) => {
+                const bookingItem = document.createElement('div');
+                bookingItem.classList.add('booking-item');
+
+                // Получаем текущее время
+                let currentTime = new Date();
+                let minutes = currentTime.getMinutes();
+                let roundedMinutes = Math.ceil(minutes / 15) * 15;
+
+                // Если округление привело к 60 минутам, то прибавляем 1 час
+                if (roundedMinutes === 60) {
+                    currentTime.setHours(currentTime.getHours() + 1);
+                    roundedMinutes = 0; // Устанавливаем минуты на 0
+                }
+
+                // Форматируем часы и минуты для поля input
+                let hours = currentTime.getHours().toString().padStart(2, '0');
+                let formattedMinutes = roundedMinutes.toString().padStart(2, '0');
+
+                const formattedTime = `${hours}:${formattedMinutes}`;
+
+                bookingItem.innerHTML = `
+                    <h3>${service}</h3>
+                    <label for="startBooking${index}">Начало бронирования</label>
+                    <input type="time" id="startBooking${index}" name="startBooking${index}" value="${formattedTime}" readonly>
+
+                    <label for="endBooking${index}">Конец бронирования</label>
+                    <input type="time" id="endBooking${index}" name="endBooking${index}">
+
+                    <label for="environment${index}">Вид тестовой среды</label>
+                    <select id="environment${index}" name="environment${index}">
+                        <option value="dev">Development</option>
+                        <option value="int">Integration</option>
+                        <option value="pre-live">Pre-live</option>
+                    </select>
+                `;
+
+
+                selectedServicesContainer.appendChild(bookingItem);
+            });
+        }
+    }
+
+    function showServiceSelection() {
+        // Возвращаемся к выбору сервисов
+        document.getElementById('service-selection').style.display = 'block';
+        document.getElementById('booking-form').style.display = 'none';
+
+        // Удаляем CSS для формы бронирования, если нужно отключить стили
+        const link = document.getElementById('bookingFormStyles');
+        if (link) {
+            document.head.removeChild(link);
+        }
+    }
+</script>
+</body>
+</html>

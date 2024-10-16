@@ -1,0 +1,189 @@
+/* Основные стили */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+header {
+    background-color: #1976D2;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    position: relative; /* Для аватарки пользователя */
+}
+
+nav {
+    display: flex;
+    justify-content: space-around;
+    width: 50%;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.nav-button:hover:not(.active) {
+    background-color: #1565C0; /* Подсветка при наведении для неактивных кнопок */
+}
+
+.nav-button.active {
+    background-color: #1976D2;
+    color: white;
+    position: relative;
+    padding: 10px 20px;
+    cursor: default;
+}
+
+.nav-button.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: white; /* Белая линия под активной кнопкой */
+}
+
+/* Аватарка пользователя в правом углу */
+.avatar-container {
+    position: absolute;
+    right: 20px;
+}
+
+.user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    margin-top: -10px; /* Сдвиг аватара, чтобы не увеличивать высоту хэдера */
+}
+
+.user-avatar:hover {
+    transform: scale(1.1); /* Увеличение аватара при наведении */
+}
+
+main {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    max-width: 900px;
+    width: 100%;
+    padding: 20px;
+    margin-top: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.search-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+form {
+    display: flex; /* Flexbox для формы */
+    width: 100%;
+}
+
+.search-input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    flex-grow: 1; /* Поле будет занимать оставшееся пространство */
+    margin-right: 10px; /* Добавляем отступ справа, чтобы отделить кнопку */
+    box-sizing: border-box; /* Учитываем padding и границы в ширину */
+}
+
+.search-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #1976D2;
+    color: white;
+    cursor: pointer;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+
+/* Стили списка сервисов */
+.service-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.service-item {
+    background-color: #ffffff;
+    border: 1px solid #1976D2;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+}
+
+.service-name {
+    font-weight: bold;
+    font-size: 18px;
+    color: #333;
+}
+
+.service-env, .service-time {
+    font-size: 14px;
+    color: #666;
+    margin-top: 3px;
+}
+
+/* Стиль для пользователя с аватаркой */
+.service-user {
+    display: flex;
+    align-items: center; /* Центрирование по вертикали */
+    gap: 10px; /* Отступ между аватаркой и именем */
+    font-size: 14px;
+    color: #666;
+}
+
+/* Маленькая аватарка для пользователя */
+.user-avatar-small {
+    width: 30px;
+    height: 30px;
+    border-radius: 20%;
+}
+
+@media (max-width: 768px) {
+    .nav-button {
+        font-size: 16px;
+    }
+
+    .search-input {
+        width: 75%;
+    }
+
+    .container {
+        margin-top: 10px;
+        padding: 10px;
+    }
+}
